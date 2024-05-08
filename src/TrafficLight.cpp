@@ -16,9 +16,9 @@ T MessageQueue<T>::receive()
         _cond.wait();
     }
 
-    T msg = std::move(_queue.back());
+    T message = std::move(_queue.back());
     _queue.pop_back();
-    return msg;
+    return message;
 }
 
 template <typename T>
@@ -77,11 +77,11 @@ void TrafficLight::cycleThroughPhases()
     std::random_device random;
     std::mt19937 eng(random());
     std::uniform_real_distribution<> dis(4000,6000);
-    double time_cycle = dis(eng);
+    double timeCycle = dis(eng);
 
     while(1) {
-        long lastTimeSinceUpdate = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - lastUpdate).count();
-        if(lastTimeSinceUpdate > time_cycle) {
+        long lastTimeUpdate = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - lastUpdate).count();
+        if(lastTimeUpdate > timeCycle) {
             _currentPhase = (_currentPhase == TrafficLightPhase::red) ? TrafficLightPhase::green : TrafficLightPhase::red;
             _queue->send(std::move(_currentPhase));
         }
