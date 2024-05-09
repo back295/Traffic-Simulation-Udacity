@@ -37,7 +37,7 @@ void MessageQueue<T>::send(T &&msg)
 
 TrafficLight::TrafficLight()
 {
-    _queue = std::make_shared<MessageQueue<TrafficLightPhase>>();
+    _messageQueue = std::make_shared<MessageQueue<TrafficLightPhase>>();
     _currentPhase = TrafficLightPhase::red;
 }
 
@@ -47,7 +47,7 @@ void TrafficLight::waitForGreen()
     // runs and repeatedly calls the receive function on the message queue. 
     // Once it receives TrafficLightPhase::green, the method returns.
     while(1) {
-        TrafficLightPhase color = _queue->receive();
+        TrafficLightPhase color = _messageQueue->receive();
         if(color == TrafficLightPhase::green) {
             return;
         }
@@ -83,7 +83,7 @@ void TrafficLight::cycleThroughPhases()
         long lastTimeUpdate = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - lastUpdate).count();
         if(lastTimeUpdate >= timeCycle) {
             _currentPhase = (_currentPhase == TrafficLightPhase::red) ? TrafficLightPhase::green : TrafficLightPhase::red;
-            _queue->send(std::move(_currentPhase));
+            _messageQueue->send(std::move(_currentPhase));
             lastUpdate = std::chrono::system_clock::now();
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
