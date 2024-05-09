@@ -13,8 +13,8 @@ T MessageQueue<T>::receive()
     // The received object should then be returned by the receive function. 
     std::unique_lock<std::mutex> lock(_mutex);
     while(_queue.empty()) {
-        _cond.wait();
-    }
+        _cond.wait(lock);
+    };
 
     T message = std::move(_queue.back());
     _queue.pop_back();
@@ -27,7 +27,7 @@ void MessageQueue<T>::send(T &&msg)
     // FP.4a : The method send should use the mechanisms std::lock_guard<std::mutex> 
     // as well as _condition.notify_one() to add a new message to the queue and afterwards send a notification.
     std::lock_guard<std::mutex> lock(_mutex);
-    _queue.push_back(std::move(msg));
+    _queue.emplace_back(std::move(msg));
     _cond.notify_one();
 }
 
@@ -81,11 +81,11 @@ void TrafficLight::cycleThroughPhases()
 
     while(1) {
         long lastTimeUpdate = std::chrono::duration_cast<std::chrono::milliseconds>(std::chrono::system_clock::now() - lastUpdate).count();
-        if(lastTimeUpdate > timeCycle) {
+        if(lastTimeUpdate >= timeCycle) {
             _currentPhase = (_currentPhase == TrafficLightPhase::red) ? TrafficLightPhase::green : TrafficLightPhase::red;
             _queue->send(std::move(_currentPhase));
+            lastUpdate = std::chrono::system_clock::now();
         }
-        lastUpdate = std::chrono::system_clock::now();
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
     }
 }

@@ -34,6 +34,7 @@ class Intersection : public TrafficObject
 public:
     // constructor / desctructor
     Intersection();
+    ~Intersection() = default;
 
     // getters / setters
     void setIsBlocked(bool isBlocked);

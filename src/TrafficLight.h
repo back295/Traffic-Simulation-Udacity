@@ -27,7 +27,7 @@ public:
     void send(T &&msg);
     T receive(void);
 private:
-    std::dequeue<T> _queue;
+    std::deque<T> _queue;
     std::condition_variable _cond;
     std::mutex _mutex;
 };
@@ -42,7 +42,7 @@ class TrafficLight : public TrafficObject
 {
 public:
     TrafficLight();
-    ~TrafficLight();
+    ~TrafficLight() = default; 
     // constructor / desctructor
 
     // getters / setters
